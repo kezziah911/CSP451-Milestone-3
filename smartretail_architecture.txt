@@ -1,0 +1,37 @@
+
++----------------------+
+|  Backend Service     |
+|  (Event Producer)    |
+|  - Generates order   |
+|    events in JSON    |
+|  - Sends to Azure    |
+|    Storage Queue     |
++----------+-----------+
+           |
+           v
++----------------------+
+| Azure Storage Queue  |
+| ("product-events")   |
++----------+-----------+
+           |
+           v
++----------------------+
+| Azure Function       |
+| (Queue-triggered)    |
+| - Reads messages     |
+| - Extracts           |
+|   correlationId      |
+| - Sends POST to      |
+|   Supplier API       |
++-----+----------+-----+
+      |          |
+      v          v
++----------------------+       +----------------------+
+| Application Insights |       | Supplier API         |
+| & Log Analytics      |       | (Dockerized)         |
+| - End-to-end tracing |       | - Receives POST      |
+| - Logs with          |       | - Logs with          |
+|   correlationId      |       |   correlationId      |
++----------------------+       | - Responds with      |
+                                |   confirmation       |
+                                +----------------------+
